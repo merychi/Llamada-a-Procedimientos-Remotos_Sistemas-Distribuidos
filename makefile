@@ -1,4 +1,4 @@
-# Makefile para el proyecto de Key-Value Store con gRPC
+
 
 # Variables
 GOCMD=go
@@ -7,7 +7,7 @@ GOCLEAN=$(GOCMD) clean
 GOTEST=$(GOCMD) test
 GOPATH_BIN=$(shell $(GOCMD) env GOPATH)/bin
 
-# Nombre de los binarios de salida, tal como pide el enunciado
+# Nombre de los binarios de salida
 SERVER_BIN=lbserver.exe
 CLIENT_BIN=lbclient.exe
 
@@ -37,7 +37,6 @@ client:
 	@echo "Cliente compilado en ./${CLIENT_BIN}"
 
 # Target para generar el código Go a partir del .proto
-# Esto debe ejecutarse si modificas el archivo .proto
 proto:
 	@echo "Generando código gRPC desde $(PROTO_FILE)..."
 	@# Comprobar si protoc-gen-go y protoc-gen-go-grpc están instalados

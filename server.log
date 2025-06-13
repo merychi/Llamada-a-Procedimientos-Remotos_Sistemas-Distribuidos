@@ -1,0 +1,30 @@
+2025/06/13 17:06:33 Inicializando el almacén clave-valor...
+2025/06/13 17:06:33 Iniciando proceso de recuperación...
+2025/06/13 17:06:33 Reaplicando operaciones desde el WAL...
+2025/06/13 17:06:33 Recuperación del WAL completada. 18000 operaciones reaplicadas.
+2025/06/13 17:06:33 Almacén inicializado. Tamaño inicial del WAL: 98938010 bytes.
+2025/06/13 17:06:33 SERVIDOR ESCUCHANDO EN [::]:50051
+2025/06/13 17:07:06 Disparador de snapshot por tamaño activado.
+2025/06/13 17:07:08 Iniciando creación de snapshot...
+2025/06/13 17:07:12 Snapshot creado exitosamente con 26000 claves.
+2025/06/13 17:07:12 Rotación del WAL completada.
+2025/06/13 17:07:12 Disparador de snapshot por tamaño activado.
+2025/06/13 17:07:14 Iniciando creación de snapshot...
+2025/06/13 17:07:17 Snapshot creado exitosamente con 26000 claves.
+2025/06/13 17:07:17 Rotación del WAL completada.
+2025/06/13 17:08:05 Disparador de snapshot por tamaño activado.
+2025/06/13 17:08:07 Iniciando creación de snapshot...
+2025/06/13 17:08:13 Snapshot creado exitosamente con 42000 claves.
+2025/06/13 17:08:13 Rotación del WAL completada.
+2025/06/13 17:08:13 Disparador de snapshot por tamaño activado.
+2025/06/13 17:08:15 Iniciando creación de snapshot...
+2025/06/13 17:08:22 Snapshot creado exitosamente con 42000 claves.
+2025/06/13 17:08:22 Rotación del WAL completada.
+2025/06/13 17:09:08 Disparador de snapshot por tamaño activado.
+2025/06/13 17:09:10 Iniciando creación de snapshot...
+2025/06/13 17:09:16 Snapshot creado exitosamente con 42000 claves.
+2025/06/13 17:09:16 Rotación del WAL completada.
+2025/06/13 17:09:16 Disparador de snapshot por tamaño activado.
+2025/06/13 17:09:18 Iniciando creación de snapshot...
+2025/06/13 17:09:25 Snapshot creado exitosamente con 42000 claves.
+2025/06/13 17:09:25 Rotación del WAL completada.

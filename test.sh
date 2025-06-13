@@ -1,116 +1,111 @@
 #!/bin/bash
 
 # ==============================================================================
-# Script de Prueba Simple para el Servidor Key-Value
-# - Inicia el servidor en segundo plano.
-# - Lanza 10 clientes concurrentes que realizan operaciones.
-# - Espera a que los clientes terminen.
-# - Pide y muestra las estadísticas finales del servidor.
-# - Detiene el servidor de forma limpia.
+# SCRIPT DE PRUEBA PARA EL SERVIDOR KEY-VALUE (v4)
+# - Compila los binarios en la raíz del proyecto.
+# - Nombres de binarios: Ibserver e Ibclient.
 # ==============================================================================
 
-# Colores para la salida
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-NC='\033[0m' # Sin color
-
 # --- Configuración ---
+SERVER_SRC_DIR="./server"
+CLIENT_SRC_DIR="./client"
+
+# Nombres de los binarios de salida (en la raíz del proyecto)
 SERVER_BIN="./lbserver"
 CLIENT_BIN="./lbclient"
-NUM_CLIENTS=10
-OPS_PER_CLIENT=1000 # 10K en total (10 clientes * 1000 ops)
 
-# Función para limpiar procesos anteriores si el script falló
-cleanup() {
-    echo -e "${YELLOW}Limpiando procesos de servidor anteriores...${NC}"
-    pkill -f $SERVER_BIN
-    # Esperar un poco para asegurarse de que el puerto se libere
-    sleep 1
+# Archivos de salida
+SERVER_LOG="server.log"
+DATA_DIR="./data"
+
+# Parámetros de la prueba
+NUM_CLIENTS=10
+OPS_PER_CLIENT=1000 # 10 clientes * 1000 ops = 10K operaciones totales
+
+# --- Funciones de Utilidad ---
+print_header() {
+    echo ""
+    echo "============================================================"
+    echo "=> $1"
+    echo "============================================================"
 }
 
-# --- Ejecución Principal ---
+# --- 1. Limpieza y Preparación ---
+print_header "Paso 1: Limpiando y Preparando el Entorno"
+echo "Limpiando artefactos de ejecuciones anteriores..."
+# Se eliminan los binarios de la raíz, el directorio de datos y los logs.
+rm -f "$SERVER_BIN" "$CLIENT_BIN" "$SERVER_LOG" benchmark_results.csv
+rm -rf "$DATA_DIR"
 
-# 1. Compilar todo usando el Makefile
-echo -e "${YELLOW}Paso 1: Compilando el proyecto...${NC}"
-make
-if [ $? -ne 0 ]; then
-    echo "Error en la compilación. Abortando."
+# --- 2. Compilación ---
+print_header "Paso 2: Compilando el Servidor y el Cliente"
+echo "Compilando el servidor desde '$SERVER_SRC_DIR' -> $SERVER_BIN"
+go build -o "$SERVER_BIN" "$SERVER_SRC_DIR"
+
+echo "Compilando el cliente desde '$CLIENT_SRC_DIR' -> $CLIENT_BIN"
+go build -o "$CLIENT_BIN" "$CLIENT_SRC_DIR"
+
+if [ ! -f "$SERVER_BIN" ] || [ ! -f "$CLIENT_BIN" ]; then
+    echo "Error: La compilación falló."
     exit 1
 fi
-echo -e "${GREEN}Compilación exitosa.${NC}"
-echo ""
+echo "Compilación completada."
 
-# Limpiar cualquier instancia del servidor que pudiera haber quedado colgada
-cleanup
-
-# 2. Iniciar el servidor
-echo -e "${YELLOW}Paso 2: Iniciando el servidor en segundo plano...${NC}"
-$SERVER_BIN &
-SERVER_PID=$!
+# --- 3. Iniciar el Servidor ---
+print_header "Paso 3: Iniciando el Servidor"
 SERVER_START_TIME=$(date +"%Y-%m-%d %H:%M:%S")
-
-# Dar un momento al servidor para que arranque completamente
+# Ejecutar el binario desde la raíz
+./"$SERVER_BIN" > "$SERVER_LOG" 2>&1 &
+SERVER_PID=$!
 sleep 2
-
-# Verificar si el servidor sigue corriendo
 if ! ps -p $SERVER_PID > /dev/null; then
-   echo "Error: El servidor no pudo iniciarse. Abortando."
+   echo "Error: ¡El servidor no pudo iniciarse! Revisa el log: $SERVER_LOG"
    exit 1
 fi
-echo -e "${GREEN}Servidor iniciado exitosamente.${NC}"
-echo "   - PID: $SERVER_PID"
-echo "   - Hora de inicio: $SERVER_START_TIME"
-echo ""
+echo "Servidor iniciado con éxito (PID: $SERVER_PID)."
 
-# 3. Lanzar clientes concurrentes
-echo -e "${YELLOW}Paso 3: Lanzando $NUM_CLIENTS clientes, cada uno con $OPS_PER_CLIENT operaciones...${NC}"
-for i in $(seq 1 $NUM_CLIENTS); do
-    # Cada cliente realiza una mezcla de operaciones en segundo plano
-    (
-      for j in $(seq 1 $OPS_PER_CLIENT); do
-        key="cliente${i}_clave${j}"
-        value="valor_de_prueba_${i}_${j}"
-        
-        # Mezcla de operaciones: 50% set, 49% get, 1% getprefix
-        op_rand=$((1 + RANDOM % 100))
-        if [ $op_rand -le 50 ]; then
-            $CLIENT_BIN set "$key" "$value" > /dev/null
-        elif [ $op_rand -le 99 ]; then
-            $CLIENT_BIN get "$key" > /dev/null
-        else
-            $CLIENT_BIN getprefix "cliente${i}" > /dev/null
-        fi
-      done
-      echo "   - Cliente $i terminó."
-    ) &
-done
+# --- 4. Ejecutar Clientes de Prueba de Carga (SET/GET) ---
+print_header "Paso 4: Ejecutando Prueba de Carga (SET/GET)"
+echo "Iniciando $NUM_CLIENTS clientes, cada uno con $OPS_PER_CLIENT operaciones..."
+# Ejecutar el binario desde la raíz
+./"$CLIENT_BIN" benchmark -clients $NUM_CLIENTS -ops $OPS_PER_CLIENT -workload "50-50"
+echo "Prueba de carga completada."
 
-# Esperar a que todos los procesos de los clientes en segundo plano terminen
-wait
-echo -e "${GREEN}Todos los clientes han completado sus operaciones.${NC}"
-echo ""
+# --- 4.5. Ejecutar Prueba de GetPrefix ---
+print_header "Paso 4.5: Ejecutando Prueba de GetPrefix"
+PREFIX_TO_SEARCH="bench-w0-"
+echo "Buscando claves con el prefijo: '$PREFIX_TO_SEARCH'..."
+# Ejecutar el binario desde la raíz
+./"$CLIENT_BIN" getprefix "$PREFIX_TO_SEARCH" > /dev/null
+echo "Prueba de GetPrefix completada."
 
-# 4. Obtener y mostrar estadísticas finales
-echo -e "${YELLOW}Paso 4: Obteniendo estadísticas finales del servidor...${NC}"
-STATS_OUTPUT=$($CLIENT_BIN stats)
+# --- 5. Obtener Estadísticas Finales ---
+print_header "Paso 5: Obteniendo Estadísticas Finales"
+# Ejecutar el binario desde la raíz
+STATS_OUTPUT=$(./"$CLIENT_BIN" stats)
 
-# El enunciado pide mostrar estos valores específicos
-TOTAL_SETS=$(echo "$STATS_OUTPUT" | grep "Operaciones Set" | awk '{print $3}')
-TOTAL_GETS=$(echo "$STATS_OUTPUT" | grep "Operaciones Get" | awk '{print $3}')
-TOTAL_GETPREFIXES=$(echo "$STATS_OUTPUT" | grep "Operaciones GetPrefix" | awk '{print $3}')
+TOTAL_SETS=$(echo "$STATS_OUTPUT"     | awk '/Operaciones Set/ {print $NF}')
+TOTAL_GETS=$(echo "$STATS_OUTPUT"     | awk '/Operaciones Get/ {print $NF}')
+TOTAL_PREFIXES=$(echo "$STATS_OUTPUT" | awk '/Operaciones GetPrefix/ {print $NF}')
 
-echo -e "${GREEN}--- Estadísticas Requeridas ---${NC}"
-echo "Hora de inicio del servidor:   $SERVER_START_TIME"
-echo "#total_sets completados:       $TOTAL_SETS"
-echo "#total_gets completados:       $TOTAL_GETS"
-echo "#total_getprefixes completados: $TOTAL_GETPREFIXES"
-echo -e "${GREEN}-------------------------------${NC}"
-echo ""
+TOTAL_SETS=${TOTAL_SETS:-0}
+TOTAL_GETS=${TOTAL_GETS:-0}
+TOTAL_PREFIXES=${TOTAL_PREFIXES:-0}
 
-
-# 5. Detener el servidor
-echo -e "${YELLOW}Paso 5: Deteniendo el servidor...${NC}"
+# --- 6. Detener el Servidor ---
+print_header "Paso 6: Deteniendo el Servidor"
+echo "Enviando señal de terminación al servidor (PID: $SERVER_PID)..."
 kill $SERVER_PID
-# Esperar a que el proceso del servidor termine realmente
 wait $SERVER_PID 2>/dev/null
-echo -e "${GREEN}Servidor detenido. Prueba completada.${NC}"
+echo "Servidor detenido."
+
+# --- 7. Reporte Final ---
+print_header "Resumen Final de la Prueba"
+echo "Hora de inicio del servidor:    $SERVER_START_TIME"
+echo "#total_sets completados:        $TOTAL_SETS"
+echo "#total_gets completados:        $TOTAL_GETS"
+echo "#total_getprefixes completados: $TOTAL_PREFIXES"
+echo ""
+echo "¡Prueba finalizada!"
+
+exit 0
