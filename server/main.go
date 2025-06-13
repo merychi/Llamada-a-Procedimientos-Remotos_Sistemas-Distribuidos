@@ -121,7 +121,6 @@ func (s *ShardedStore) getShard(key string) *KeyValueStoreShard {
 // 1. Carga el último 'snapshot' (la foto completa más reciente de los datos).
 // 2. Reaplica las operaciones del WAL (diario) que ocurrieron después de ese snapshot.
 func (s *ShardedStore) recoverStore() error {
-	// ... (código de recuperación)
 	log.Println("Iniciando proceso de recuperación...")
 	var snapshotTimestamp int64 = 0
 	snapshotData, err := os.ReadFile(s.snapshotPath)
