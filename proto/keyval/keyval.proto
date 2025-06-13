@@ -1,0 +1,64 @@
+syntax = "proto3";
+
+package kvstore;
+
+option go_package = "kvstore/proto";
+
+// --- Mensajes principales --- //
+message KeyValuePair {
+  string key = 1;    // Máximo 128 bytes (validado en servidor)
+  bytes value = 2;  // Sin límite de tamaño
+}
+
+// --- Operación Set --- //
+message SetRequest {
+  KeyValuePair pair = 1;
+}
+
+message SetResponse {
+  bool success = 1;
+  string message = 2;  // Ej: "key.abc (128B) set with value (512B)"
+}
+
+// --- Operación Get --- //
+message GetRequest {
+  string key = 1;
+}
+
+message GetResponse {
+  bytes value = 1;  // <-- CAMBIO CRÍTICO AQUÍ (de string a bytes)
+  bool found = 2;
+}
+
+// --- Operación GetPrefix (Streaming) --- //
+message GetPrefixRequest {
+  string prefix = 1;   // Prefijo a buscar
+}
+
+message GetPrefixStreamResponse {
+  oneof response {
+    KeyValuePair pair = 1;  // Pares enviados uno a uno
+    uint32 total_matches = 2; // Opcional: Total de coincidencias (último mensaje)
+  };
+}
+
+// --- Estadísticas (oculto) --- //
+message StatRequest {} // Vacío intencionalmente
+
+message StatResponse {
+  uint64 total_keys = 1;
+  uint64 total_size_bytes = 2;
+  uint64 set_operations = 3;
+  uint64 get_operations = 4;
+  uint64 prefix_operations = 5;
+  uint64 active_clients = 6;
+  uint64 ops_per_second = 7;
+}
+
+// --- Servicio --- //
+service KeyValueService {
+  rpc Set(SetRequest) returns (SetResponse);
+  rpc Get(GetRequest) returns (GetResponse);
+  rpc GetPrefixStream(GetPrefixRequest) returns (stream GetPrefixStreamResponse);
+  rpc Stat(StatRequest) returns (StatResponse);
+}
