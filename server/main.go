@@ -410,7 +410,10 @@ func main() {
 	lis, err := net.Listen("tcp", ":50051")
 	if err != nil { log.Fatalf("falló al escuchar: %v", err) }
 	
-	s := grpc.NewServer()
+	s := grpc.NewServer(
+    grpc.MaxRecvMsgSize(10 * 1024 * 1024), // Aumenta a 10 MB
+    grpc.MaxSendMsgSize(10 * 1024 * 1024), // Aumenta a 10 MB
+	)
 	pb.RegisterKeyValueServiceServer(s, &Server{kvStore: kvStore})
 	log.Printf("SERVIDOR ESCUCHANDO EN %v", lis.Addr())
 	if err := s.Serve(lis); err != nil { log.Fatalf("falló al servir: %v", err) }
