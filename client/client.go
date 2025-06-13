@@ -211,7 +211,7 @@ func doBenchmark() {
 	defer writer.Flush()
 	writer.Write([]string{"workload", "value_size_bytes", "client_id", "op_id", "op_type", "latency_ms"})
 
-	// Importante: Se pre-cargan datos para que las pruebas de lectura (GET) tengan claves que encontrar.
+	// Se pre-cargan datos para que las pruebas de lectura (GET) tengan claves que encontrar.
 	fmt.Println("Pre-poblando datos para lecturas de benchmark...")
 	prepopulateValue := make([]byte, *valueSize)
 	rand.Read(prepopulateValue)
@@ -289,7 +289,7 @@ func main() {
 	}
 	
 	command := flag.Arg(0)
-	// Buena práctica: Crea un contexto con tiempo de espera para evitar que el cliente se cuelgue indefinidamente.
+	//  Crea un contexto con tiempo de espera para evitar que el cliente se cuelgue indefinidamente.
 	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
 	defer cancel()
 
