@@ -1,28 +1,63 @@
-# AsignacionServidor
-**Proyecto #2 de sistemas distribuidos**
-
-## Descripción
-Se desarrolla la implementación de un servicio de almacenamiento clave-valor (non-replicated key-value store) con operaciones básicas (get/put/delete).
+# 🚀 Almacén Clave-Valor Distribuido con gRPC  
+**Actividad 2.2 de Sistemas Distribuidos**
 
 ---
 
-## Objetivo del proyecto 
-
-Se busca implementar un servicio clave-valor no replicado con operaciones básicas (set, get, getPrefix), garantizando:
-
-- Persistencia: Sin pérdida de datos ante fallos (cortes de energía, crashes).
-- Concurrencia: Soporte para múltiples clientes con gestión eficiente de bloqueos.
-- Rendimiento: Mediciones mediante benchmarks (operaciones/segundo, latencia).
+## 📜 Descripción  
+Este proyecto implementa un sistema de almacenamiento clave-valor (key-value store) no replicado.  
+Está desarrollado en **Go** y utiliza **gRPC** para la comunicación cliente-servidor.  
+Su diseño prioriza la **durabilidad**, **concurrencia** y **rendimiento**.
 
 ---
 
-## ¿Cómo probar el programa?
+## 🎯 Objetivos y Características
 
+- 🔑 **API Funcional:**  
+  - `set(key, value)`: almacena o actualiza un par clave-valor.  
+  - `get(key)`: recupera el valor de una clave.  
+  - `getPrefix(prefix)`: obtiene todos los pares con clave que empieza con un prefijo.
 
+- 🛡️ **Durabilidad y Persistencia:**  
+  - Write-Ahead Logging (WAL) para evitar pérdida de datos ante fallos.  
+  - Snapshots periódicos para acelerar recuperación y compactar logs.
+
+- ⚙️ **Alta Concurrencia:**  
+  - Sharding para dividir la carga.  
+  - Bloqueos finos (`RWMutex`) para permitir operaciones paralelas sin conflictos.
+
+- 📊 **Rendimiento Medible:**  
+  - Cliente con modo benchmark para medir latencia y throughput.
 
 ---
 
-## Tecnologías utilizadas 
+## 🛠 Tecnologías Utilizadas
 
-- Lenguaje: Go
-- Comunicación: gRPC
+- **Lenguaje:** Go  
+- **Comunicación:** gRPC  
+- **Serialización:** Protocol Buffers (Protobuf)  
+- **Automatización:** Makefile  
+- **Scripts:** Shell (`.sh`) para pruebas y benchmarks  
+- **Visualización:** Python (`pandas`, `matplotlib`) para análisis de datos
+
+---
+
+## ⚙️ Cómo probar el programa
+
+### 🔧 Requisitos previos
+
+- Go 1.18+  
+- Make  
+- Protoc con plugins Go para gRPC
+
+### 🚀 Pasos para compilar y ejecutar
+
+1. **Compilar los archivos de Prueba**  
+
+- Primera Prueba: make test
+- Experimento 1:  make experimento1
+- Experimento 2:  make experimento2
+- Experimento 3:  make experimento3
+- Para Graficar resultados: python graficar.py
+- Para limpiar archivos generados: make clean
+
+
