@@ -7,7 +7,7 @@ option go_package = "kvstore/proto";
 // --- Mensajes principales --- //
 message KeyValuePair {
   string key = 1;    // Máximo 128 bytes (validado en servidor)
-  bytes value = 2;  // Sin límite de tamaño
+  bytes value = 2;  
 }
 
 // --- Operación Set --- //
@@ -17,7 +17,7 @@ message SetRequest {
 
 message SetResponse {
   bool success = 1;
-  string message = 2;  // Ej: "key.abc (128B) set with value (512B)"
+  string message = 2;  
 }
 
 // --- Operación Get --- //
@@ -26,23 +26,23 @@ message GetRequest {
 }
 
 message GetResponse {
-  bytes value = 1;  // <-- CAMBIO CRÍTICO AQUÍ (de string a bytes)
+  bytes value = 1;  
   bool found = 2;
 }
 
 // --- Operación GetPrefix (Streaming) --- //
 message GetPrefixRequest {
-  string prefix = 1;   // Prefijo a buscar
+  string prefix = 1;  
 }
 
 message GetPrefixStreamResponse {
   oneof response {
-    KeyValuePair pair = 1;  // Pares enviados uno a uno
-    uint32 total_matches = 2; // Opcional: Total de coincidencias (último mensaje)
+    KeyValuePair pair = 1; 
+    uint32 total_matches = 2; 
   };
 }
 
-// --- Estadísticas (oculto) --- //
+// --- Estadísticas  --- //
 message StatRequest {} // Vacío intencionalmente
 
 message StatResponse {
