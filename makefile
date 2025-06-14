@@ -8,8 +8,8 @@ GOTEST=$(GOCMD) test
 GOPATH_BIN=$(shell $(GOCMD) env GOPATH)/bin
 
 # Nombre de los binarios de salida
-SERVER_BIN=lbserver.exe
-CLIENT_BIN=lbclient.exe
+SERVER_BIN=lbserver
+CLIENT_BIN=lbclient
 
 # Rutas a los paquetes Go
 SERVER_PKG=./server
@@ -63,9 +63,29 @@ clean:
 # Target para ejecutar el script de prueba simple requerido
 test: all
 	@echo "Ejecutando el script de prueba simple (test.sh)..."
-	@# Asegurarse de que el script tiene permisos de ejecución
-	@chmod +x ./test.sh
-	./test.sh
+	@chmod +x ./scripts/test.sh
+	./scripts/test.sh
+
+# Targets para ejecutar cada experimento individual
+experimento1: all
+	@echo "Ejecutando Experimento 1: Latencia vs Tamaño de Valor..."
+	@chmod +x ./scripts/experimento1.sh
+	./scripts/experimento1.sh
+
+experimento2: all
+	@echo "Ejecutando Experimento 2: Recuperación ante Fallos..."
+	@chmod +x ./scripts/experimento2.sh
+	./scripts/experimento2.sh
+
+experimento3: all
+	@echo "Ejecutando Experimento 3: Escalabilidad con Clientes Concurrentes..."
+	@chmod +x ./scripts/experimento3.sh
+	./scripts/experimento3.sh
+
+# Target para ejecutar todos los experimentos en orden
+test-all: test experimento1 experimento2 experimento3
+	@echo "Todos los experimentos han sido ejecutados con éxito."
+
 
 # Target de conveniencia para correr el servidor
 run-server: all
