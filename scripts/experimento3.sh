@@ -36,7 +36,6 @@ print_header "FASE 1: Limpieza y Preparación"
 echo "Eliminando datos antiguos y compilando los binarios..."
 rm -rf "${DATA_DIR}"
 rm -f "${COLD_READ_RESULTS}" "${HOT_READ_RESULTS}"
-make client server
 
 # --- FASE 2: Población de Datos ---
 print_header "FASE 2: Población de Datos"

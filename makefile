@@ -61,23 +61,23 @@ clean:
 	@echo "Limpieza completada."
 
 # Target para ejecutar el script de prueba simple requerido
-test: all
+test: 
 	@echo "Ejecutando el script de prueba simple (test.sh)..."
 	@chmod +x ./scripts/test.sh
 	./scripts/test.sh
 
 # Targets para ejecutar cada experimento individual
-experimento1: all
+experimento1:
 	@echo "Ejecutando Experimento 1: Latencia vs Tamaño de Valor..."
 	@chmod +x ./scripts/experimento1.sh
 	./scripts/experimento1.sh
 
-experimento2: all
+experimento2: 
 	@echo "Ejecutando Experimento 2: Recuperación ante Fallos..."
 	@chmod +x ./scripts/experimento2.sh
 	./scripts/experimento2.sh
 
-experimento3: all
+experimento3: 
 	@echo "Ejecutando Experimento 3: Escalabilidad con Clientes Concurrentes..."
 	@chmod +x ./scripts/experimento3.sh
 	./scripts/experimento3.sh
